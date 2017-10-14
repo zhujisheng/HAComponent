@@ -9,6 +9,7 @@ tts:
     appid: YOUR_APPID 
     apikey: YOUR_APIKEY
     secretkey: YOUR_SECRETKEY
+    person: 4
 </pre>
     
 Configura</li>tion variables:
