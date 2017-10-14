@@ -1,4 +1,4 @@
-The Baidu text-to-speech platform uses Baidu TTS engine to read a text with natural sounding voices.
+The Baidu text-to-speech platform uses <a href="https://cloud.baidu.com/product/speech/tts">Baidu TTS engine</a> to read a text with natural sounding voices.
 
 To enable text-to-speech with Baidu, add the following lines to your configuration.yaml:
 
