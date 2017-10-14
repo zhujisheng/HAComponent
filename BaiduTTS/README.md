@@ -21,3 +21,5 @@ Configura</li>tion variables:
 <li>volume(Optional): Audio volume, from 0 to 15, default is 5.</li>
 <li>person(Optional): You can choose 0, 1, 3, 4, default is 0(a female voice)</li>
 </ul>
+
+Put the file "baidu.py" in the dir: "~/.homeassistant/custom_components/tts/"
