@@ -96,11 +96,9 @@ class BaiduTTSProvider(Provider):
                                       )
 
         if isinstance(result, dict):
-            _LOGGER.error("Baidu TTS error-- err_no:%d;err_msg:%s; sn:%s; idx:%d",
+            _LOGGER.error("Baidu TTS error-- err_no:%d; err_msg:%s",
                           result['err_no'],
-                          result['err_msg'],
-                          result['sn'],
-                          result['idx']
+                          result['err_msg']
                           )
             return (None, None)
 
