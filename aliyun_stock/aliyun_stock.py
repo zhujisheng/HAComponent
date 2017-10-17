@@ -6,19 +6,15 @@ by HAChina.io
 """
 import logging
 import asyncio
-import aiohttp
-import async_timeout
 from datetime import timedelta
 
 import voluptuous as vol
-
 import http.client
 
 import homeassistant.helpers.config_validation as cv
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.const import ATTR_ATTRIBUTION
 from homeassistant.helpers.entity import Entity
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -37,8 +33,6 @@ CONF_APPCODE = 'appcode'
 DEFAULT_SYMBOL = 'sz000002'
 
 ICON = 'mdi:currency-cny'
-
-SCAN_INTERVAL = timedelta(minutes=5)
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_SYMBOLS, default=[DEFAULT_SYMBOL]):
