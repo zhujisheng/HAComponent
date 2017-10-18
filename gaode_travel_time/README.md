@@ -1,3 +1,5 @@
+
+<pre class="lang:yaml decode:true">
 sensor:
   - platform: gaode_travel_time
     api_key: XXXXXXXXXXXXXXXXXXXXXXXX
@@ -9,3 +11,4 @@ sensor:
       #longitude_latitude: 121.3997,31.0456
       city: 上海
       address: 广富林路
+</pre>
