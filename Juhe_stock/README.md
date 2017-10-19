@@ -3,7 +3,7 @@ The Juhe stock platform uses <a href="https://www.juhe.cn/docs/api/id/21" rel="n
 To enable a sensor with aliyun_stock, add the following lines to your configuration.yaml:
 <pre class="lang:yaml decode:true " >#Example configuration.yaml entry
 sensor:
-  - platform: Juhe_stock
+  - platform: juhe_stock
     key: xxxxxxxxxxxxxxxxxxxx
     symbols:
       - sz000002
