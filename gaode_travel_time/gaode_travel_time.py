@@ -14,8 +14,7 @@ import voluptuous as vol
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.helpers.entity import Entity
 from homeassistant.const import (
-    ATTR_ATTRIBUTION, CONF_API_KEY, CONF_NAME, ATTR_LATITUDE,
-    ATTR_LONGITUDE)
+    ATTR_ATTRIBUTION, CONF_API_KEY )
 from homeassistant.util import Throttle
 import homeassistant.helpers.config_validation as cv
 
@@ -33,6 +32,8 @@ CONF_ATTRIBUTION = "Transport information provided by Gaode"
 CONF_LONGITUDE_LATITUDE = "longitude_latitude"
 CONF_CITY = "city"
 CONF_ADDRESS = "address"
+CONF_NAME = "name"
+CONF_FRIENDLY_NAME = 'friendly_name'
 
 DEFAULT_NAME = 'Gaode Travel Time'
 DEFAULT_TRAVEL_MODE = 'driving'
@@ -55,7 +56,8 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
         vol.Optional(CONF_CITY):cv.string,
         vol.Optional(CONF_ADDRESS):cv.string,
         })),
-    vol.Optional(CONF_NAME): cv.string,
+    vol.Optional(CONF_NAME, default= DEFAULT_NAME): cv.string,
+    vol.Optional(CONF_FRIENDLY_NAME, default= DEFAULT_NAME): cv.string,
     vol.Optional(CONF_TRAVEL_MODE, default=DEFAULT_TRAVEL_MODE): vol.In(TRAVEL_MODE),
     vol.Optional(CONF_STRATEGY,default=DEFAULT_STRATEGY):vol.All(vol.Coerce(int), vol.Range(min=0,max=9)),
     })
@@ -71,11 +73,11 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
         travel_mode = config.get(CONF_TRAVEL_MODE)
         strategy = config.get(CONF_STRATEGY)
 
-        formatted_name = "{} - {}".format(DEFAULT_NAME, travel_mode)
-        name = config.get(CONF_NAME, formatted_name)
+        name = config.get(CONF_NAME)
+        friendly_name = config.get(CONF_FRIENDLY_NAME)
 
         sensor = GaodeTravelTimeSensor(
-            hass, name, api_key, origin, destination, travel_mode, strategy)
+            hass, name, friendly_name, api_key, origin, destination, travel_mode, strategy)
 
         add_devices([sensor])
 
@@ -84,10 +86,11 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
 class GaodeTravelTimeSensor(Entity):
     """Representation of a Gaode travel time sensor."""
 
-    def __init__(self, hass, name, api_key, origin, destination, travel_mode, strategy):
+    def __init__(self, hass, name, friendly_name, api_key, origin, destination, travel_mode, strategy):
         """Initialize the sensor."""
         self._hass = hass
         self._name = name
+        self._friendly_name = friendly_name
         self._unit_of_measurement = "分钟"
 
         self._data = GaodeTravelTimeData( api_key, origin, destination, travel_mode, strategy )
@@ -113,6 +116,7 @@ class GaodeTravelTimeSensor(Entity):
                 CONF_DESTINATION:self._data._destination,
                 CONF_TRAVEL_MODE:self._data._travel_mode,
                 CONF_STRATEGY:self._data._strategy,
+                CONF_FRIENDLY_NAME:self._friendly_name,
                 "distance":self._data._distance,
                 "textguide": self._data._textguide,
                 }
@@ -186,24 +190,40 @@ class GaodeTravelTimeData(Entity):
             _LOGGER.error("Error http reponse: %d", result.status)
 
         data = json.loads( str(result.read(),encoding = 'utf-8') )
-        if(data['status'] != '1'):
-            _LOGGER.error("Error Api return, state=%s, errmsg=%s",
-                          data['status'],
-                          data['info']
-                          )
-            return
 
-        self._origin = data["route"]["origin"]
-        self._destination = data["route"]["destination"]
-        self._strategy = data["route"]["paths"][0]["strategy"]
+        if(self._travel_mode != "bicycling"):
+            if(data['status'] != '1'):
+                _LOGGER.error("Error Api return, state=%s, errmsg=%s",
+                              data['status'],
+                              data['info']
+                              )
+                return
+
+            dataroute = data["route"]
+
+            
+        else:
+            if(data['errcode'] != 0 ):
+                _LOGGER.error("Error Api return, errcode=%s, errmsg=%s",
+                              data['errcode'],
+                              data['errmsg'],
+                              )
+                return
+            dataroute = data['data']
+                    
+
+        self._origin = dataroute["origin"]
+        self._destination = dataroute["destination"]
+        if(self._travel_mode == "driving"):
+            self._strategy = dataroute["paths"][0]["strategy"]
         
-        self._duration = int(data["route"]["paths"][0]["duration"])/60
-        self._distance = float(data["route"]["paths"][0]["distance"])/1000
+        self._duration = int(dataroute["paths"][0]["duration"])/60
+        self._distance = float(dataroute["paths"][0]["distance"])/1000
 
         bypasstext = "途经"
         roadbefore = ""
-        for step in data["route"]["paths"][0]["steps"]:
-            if ('road' in step.keys()):
+        for step in dataroute["paths"][0]["steps"]:
+            if ('road' in step.keys() and step["road"] != []):
                 if( step["assistant_action"] == "到达目的地" ):
                     if (step["road"] != roadbefore):
                         bypasstext = bypasstext + roadbefore + step["road"] + "。"
