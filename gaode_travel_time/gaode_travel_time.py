@@ -11,13 +11,14 @@ import json
 
 import voluptuous as vol
 
-from homeassistant.components.sensor import PLATFORM_SCHEMA
+from homeassistant.components.sensor import (DOMAIN, PLATFORM_SCHEMA)
 from homeassistant.helpers.entity import Entity
 from homeassistant.const import (
     ATTR_ATTRIBUTION, CONF_API_KEY )
-from homeassistant.util import Throttle
+#from homeassistant.util import Throttle
+from homeassistant.helpers.event import track_time_interval
 import homeassistant.helpers.config_validation as cv
-
+import homeassistant.util.dt as dt_util
 
 
 
@@ -39,7 +40,7 @@ DEFAULT_NAME = 'Gaode Travel Time'
 DEFAULT_TRAVEL_MODE = 'driving'
 DEFAULT_STRATEGY = 0
 
-MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=5)
+TIME_BETWEEN_UPDATES = timedelta(minutes=30)
 
 
 TRAVEL_MODE = ['driving', 'walking', 'bicycling']
@@ -76,24 +77,32 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
         name = config.get(CONF_NAME)
         friendly_name = config.get(CONF_FRIENDLY_NAME)
 
-        sensor = GaodeTravelTimeSensor(
-            hass, name, friendly_name, api_key, origin, destination, travel_mode, strategy)
+        data = GaodeTravelTimeData( hass, api_key, origin, destination, travel_mode, strategy )
+
+        sensor = GaodeTravelTimeSensor( hass, name, friendly_name, data )
 
         add_devices([sensor])
+
+        def update(call=None):
+                '''Update the data by service call'''
+                data.update(dt_util.now())
+                sensor.update()
+
+        hass.services.register(DOMAIN, name+'_update', update)
 
 
 
 class GaodeTravelTimeSensor(Entity):
     """Representation of a Gaode travel time sensor."""
 
-    def __init__(self, hass, name, friendly_name, api_key, origin, destination, travel_mode, strategy):
+    def __init__(self, hass, name, friendly_name, data ):
         """Initialize the sensor."""
         self._hass = hass
         self._name = name
         self._friendly_name = friendly_name
         self._unit_of_measurement = "分钟"
+        self._data = data
 
-        self._data = GaodeTravelTimeData( api_key, origin, destination, travel_mode, strategy )
 
 
     @property
@@ -119,6 +128,7 @@ class GaodeTravelTimeSensor(Entity):
                 CONF_FRIENDLY_NAME:self._friendly_name,
                 "distance":self._data._distance,
                 "textguide": self._data._textguide,
+                "update_time": self._data._update_time
                 }
 
 
@@ -127,10 +137,10 @@ class GaodeTravelTimeSensor(Entity):
         """Return the unit this state is expressed in."""
         return self._unit_of_measurement
 
-    @Throttle(MIN_TIME_BETWEEN_UPDATES)
+    #@Throttle(TIME_BETWEEN_UPDATES)
     def update(self):
         """Get the latest data from Google."""
-        self._data.update()
+        #self._data.update()______________________????????????????????
 
 
 
@@ -138,7 +148,7 @@ class GaodeTravelTimeSensor(Entity):
 class GaodeTravelTimeData(Entity):
     """Representation of a Gaode Travel Time sensor"""
 
-    def __init__(self, api_key, origin, destination, travel_mode, strategy ):
+    def __init__(self, hass, api_key, origin, destination, travel_mode, strategy ):
         
         self._host = 'restapi.amap.com'
 
@@ -150,6 +160,8 @@ class GaodeTravelTimeData(Entity):
         self._travel_mode = travel_mode
         self._strategy = None
         self._api_key = api_key
+        self._update_time = None
+        
         
         origin_longitude_latitude = self.get_longitude_latitude(origin)
         destination_longitude_latitude = self.get_longitude_latitude(destination)
@@ -176,11 +188,14 @@ class GaodeTravelTimeData(Entity):
                           + '&strategy=' + str(strategy)
                           + '&output=JSON'
                           )
+            
+        self.update(dt_util.now())
+        track_time_interval( hass, self.update, TIME_BETWEEN_UPDATES )
 
 
 
         
-    def update(self):
+    def update(self, now):
         
         conn = http.client.HTTPConnection(self._host)
         conn.request("GET",self._url)
@@ -237,9 +252,6 @@ class GaodeTravelTimeData(Entity):
                     elif (step["road"] != roadbefore):
                         bypasstext = bypasstext + roadbefore + "、"
                         roadbefore = step["road"]
-                        
-                        
-
         
         self._textguide = ("距离%.1f公里。需花时%d分钟。%s"
                            %(self._distance,
@@ -247,6 +259,7 @@ class GaodeTravelTimeData(Entity):
                              bypasstext
                              )
                           )
+        self._update_time = dt_util.now()
 
     def get_longitude_latitude(self, address_dict):
             
