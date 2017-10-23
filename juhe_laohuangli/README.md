@@ -12,8 +12,9 @@ variables:
 <ul>
 	<li>key(Required): Key from Juhe.</li>
 </ul>
-
 Put the file "juhe_laohuangli.py" in the dir: "<code>~/.homeassistant/custom_components/sensor/</code>"
+
+
 
 juhe_laohuangli（聚合数据老黄历信息）从<a href="https://www.juhe.cn/docs/api/id/65" rel="noopener" target="_blank">聚合数据API</pre>获得数据。
 在HA的configuration.yaml中的配置：
@@ -28,6 +29,5 @@ sensor:
 <ul>
 	<li>key(Required): 从聚合数据api申请获得的key.</li>
 </ul>
-
 将文件"juhe_laohuangli.py"放在以下目录: "<code>~/.homeassistant/custom_components/sensor/</code>"
 
