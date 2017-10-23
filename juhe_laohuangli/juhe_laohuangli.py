@@ -26,7 +26,7 @@ CONF_ATTRIBUTION = "Today's laohuangli provided by Juhe"
 CONF_KEY = 'key'
 
 DEFAULT_NAME = 'LaoHuangLi'
-ICON = 'mdi:calendar'
+ICON = 'mdi:yin-yang'
 
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
@@ -147,11 +147,11 @@ class JuheLaohuangliData(object):
         
         self.yangli = result["result"]["yangli"]
         self.yinli = result["result"]["yinli"]
-        self.wuxing = result["result"]["wuxing"]
+        self.wuxing = result["result"]["wuxing"].replace(" ","、")
         self.chongsha = result["result"]["chongsha"]
-        self.baiji = result["result"]["baiji"]
-        self.jishen = result["result"]["jishen"]
-        self.yi = result["result"]["yi"]
-        self.xiongshen = result["result"]["xiongshen"]
-        self.ji = result["result"]["ji"]
+        self.baiji = result["result"]["baiji"].replace(" ","、")
+        self.jishen = result["result"]["jishen"].replace(" ","、")
+        self.yi = result["result"]["yi"].replace(" ","、")
+        self.xiongshen = result["result"]["xiongshen"].replace(" ","、")
+        self.ji = result["result"]["ji"].replace(" ","、")
 
