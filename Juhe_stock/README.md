@@ -1,6 +1,6 @@
 The Juhe stock platform uses <a href="https://www.juhe.cn/docs/api/id/21" rel="noopener" target="_blank">Juhe's stock cloud api</a>. It can get the price of stock on Shanghai and Shenzhen's security market.
 
-To enable a sensor with aliyun_stock, add the following lines to your configuration.yaml:
+To enable a sensor with juhe_stock, add the following lines to your configuration.yaml:
 <pre class="lang:yaml decode:true " >#Example configuration.yaml entry
 sensor:
   - platform: juhe_stock
