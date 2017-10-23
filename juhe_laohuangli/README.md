@@ -14,7 +14,7 @@ variables:
 </ul>
 Put the file "juhe_laohuangli.py" in the dir: "<code>~/.homeassistant/custom_components/sensor/</code>"
 
-
+<h3>中文说明</h3>
 聚合数据老黄历信息(juhe_laohuangli)从<a href="https://www.juhe.cn/docs/api/id/65" rel="noopener" target="_blank">聚合数据API</a>获得数据。
 在HA的configuration.yaml中的配置：
 <pre class="lang:yaml decode:true " >
