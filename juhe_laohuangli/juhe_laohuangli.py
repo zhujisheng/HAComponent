@@ -4,14 +4,15 @@ The chinese 老黄历 information comes from Juhe.
 by HAChina.io
 
 """
+import asyncio
+import async_timeout
+import aiohttp
 import logging
 import json
-from urllib import request, parse
-import asyncio
 from datetime import timedelta
-
 import voluptuous as vol
 
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.const import ATTR_ATTRIBUTION
@@ -39,10 +40,12 @@ def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
 
     key = config.get(CONF_KEY)
 
-    dev = []
     data = JuheLaohuangliData(hass, key)
-    dev.append(JuheLaohuangliSensor(data))
+    yield from data.async_update(dt_util.now())
+    async_track_time_change( hass, data.async_update, hour=[0], minute=[0], second=[1] )
 
+    dev = []
+    dev.append(JuheLaohuangliSensor(data))
     async_add_devices(dev, True)
 
 
@@ -115,11 +118,8 @@ class JuheLaohuangliData(object):
         self.key = key
 
 
-        self.update(dt_util.now())
-        async_track_time_change( self.hass, self.update, hour=[0], minute=[0], second=[1] )
-
-        
-    def update(self, now):
+    @asyncio.coroutine
+    def async_update(self, now):
         """Get the latest data and updates the states."""
 
         date = now.strftime("%Y-%m-%d")
@@ -128,14 +128,23 @@ class JuheLaohuangliData(object):
             "date": date,
             }
 
-        f = request.urlopen( self.url, parse.urlencode(params).encode('utf-8') )
+        try:
+            session = async_get_clientsession(self.hass)
+            with async_timeout.timeout(15, loop=self.hass.loop):
+                response = yield from session.post( self.url, data=params )
 
-        content = f.read()
-        
-        result = json.loads(content.decode('utf-8'))
+        except(asyncio.TimeoutError, aiohttp.ClientError):
+            _LOGGER.error("Error while accessing: %s", self.url)
+            return
+
+        if response.status != 200:
+            _LOGGER.error("Error while accessing: %s, status=%d", url, response.status)
+            return
+
+        result = yield from response.json()
 
         if result is None:
-            _LOGGER.error("Request api Error")
+            _LOGGER.error("Request api Error: %s", url)
             return
         elif (result["error_code"] != 0):
             _LOGGER.error("Error API return, errorcode=%s, reson=%s",
@@ -154,4 +163,3 @@ class JuheLaohuangliData(object):
         self.yi = result["result"]["yi"].replace(" ","、")
         self.xiongshen = result["result"]["xiongshen"].replace(" ","、")
         self.ji = result["result"]["ji"].replace(" ","、")
-
