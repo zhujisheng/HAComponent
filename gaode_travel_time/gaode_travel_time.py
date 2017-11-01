@@ -2,21 +2,23 @@
 Support for Gaode travel time sensors.
 
 by HAChina
+
 """
-import http.client
-from urllib.parse import quote
+
+
+import asyncio
+import async_timeout
+import aiohttp
 from datetime import timedelta
 import logging
 import json
 
 import voluptuous as vol
-
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.components.sensor import (DOMAIN, PLATFORM_SCHEMA)
 from homeassistant.helpers.entity import Entity
-from homeassistant.const import (
-    ATTR_ATTRIBUTION, CONF_API_KEY )
-#from homeassistant.util import Throttle
-from homeassistant.helpers.event import track_time_interval
+from homeassistant.const import ( ATTR_ATTRIBUTION, CONF_API_KEY )
+from homeassistant.helpers.event import async_track_time_interval
 import homeassistant.helpers.config_validation as cv
 import homeassistant.util.dt as dt_util
 
@@ -36,7 +38,7 @@ CONF_ADDRESS = "address"
 CONF_NAME = "name"
 CONF_FRIENDLY_NAME = 'friendly_name'
 
-DEFAULT_NAME = 'Gaode Travel Time'
+DEFAULT_NAME = 'Gaode_Travel_Time'
 DEFAULT_TRAVEL_MODE = 'driving'
 DEFAULT_STRATEGY = 0
 
@@ -65,30 +67,39 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 
 
 
+@asyncio.coroutine
+def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
 
-def setup_platform(hass, config, add_devices, discovery_info=None):
+    api_key = config.get(CONF_API_KEY)
+    origin = config.get(CONF_ORIGIN)
+    destination = config.get(CONF_DESTINATION)
+    travel_mode = config.get(CONF_TRAVEL_MODE)
+    strategy = config.get(CONF_STRATEGY)
 
-        api_key = config.get(CONF_API_KEY)
-        origin = config.get(CONF_ORIGIN)
-        destination = config.get(CONF_DESTINATION)
-        travel_mode = config.get(CONF_TRAVEL_MODE)
-        strategy = config.get(CONF_STRATEGY)
+    name = config.get(CONF_NAME)
+    friendly_name = config.get(CONF_FRIENDLY_NAME)
 
-        name = config.get(CONF_NAME)
-        friendly_name = config.get(CONF_FRIENDLY_NAME)
+    data = GaodeTravelTimeData( hass, api_key, origin, destination, travel_mode, strategy )
 
-        data = GaodeTravelTimeData( hass, api_key, origin, destination, travel_mode, strategy )
+
+
+    if(yield from data.async_setup()):
+        yield from data.async_update(dt_util.now())
+        async_track_time_interval( hass, data.async_update, TIME_BETWEEN_UPDATES )
 
         sensor = GaodeTravelTimeSensor( hass, name, friendly_name, data )
+        async_add_devices([sensor])
+        
+        @asyncio.coroutine
+        def async_update(call=None):
+            '''Update the data by service call'''
+            yield from data.async_update(dt_util.now())
+            sensor.async_update()
+        
+        hass.services.async_register(DOMAIN, name+'_update', async_update)
 
-        add_devices([sensor])
+        
 
-        def update(call=None):
-                '''Update the data by service call'''
-                data.update(dt_util.now())
-                sensor.update()
-
-        hass.services.register(DOMAIN, name+'_update', update)
 
 
 
@@ -131,81 +142,94 @@ class GaodeTravelTimeSensor(Entity):
                 "update_time": self._data._update_time
                 }
 
-
     @property
     def unit_of_measurement(self):
         """Return the unit this state is expressed in."""
         return self._unit_of_measurement
 
-    #@Throttle(TIME_BETWEEN_UPDATES)
-    def update(self):
-        """Get the latest data from Google."""
-        #self._data.update()______________________????????????????????
+    @asyncio.coroutine
+    def async_update(self):
+        pass
 
 
-
-
-class GaodeTravelTimeData(Entity):
+class GaodeTravelTimeData(object):
     """Representation of a Gaode Travel Time sensor"""
 
     def __init__(self, hass, api_key, origin, destination, travel_mode, strategy ):
         
-        self._host = 'restapi.amap.com'
+        self._hass = hass
+        self._origin = origin
+        self._destination = destination
+        self._strategy = strategy
+        
 
         self._duration = None
         self._distance = None
         self._textguide = None
-        self._origin = None
-        self._destination = None
         self._travel_mode = travel_mode
-        self._strategy = None
         self._api_key = api_key
         self._update_time = None
         
         
-        origin_longitude_latitude = self.get_longitude_latitude(origin)
-        destination_longitude_latitude = self.get_longitude_latitude(destination)
 
-        if( travel_mode == "walking" ):
-            self._url = ( '/v3/direction/walking?key='
-                          + api_key
+    @asyncio.coroutine    
+    def async_setup(self):
+
+        origin_longitude_latitude = yield from self.async_get_longitude_latitude(self._origin)
+        destination_longitude_latitude = yield from self.async_get_longitude_latitude(self._destination)
+
+        if (origin_longitude_latitude is None) or (destination_longitude_latitude is None):
+            _LOGGER.error("Cannot get the longitude_latitude" )
+            return False
+
+
+        if( self._travel_mode == "walking" ):
+            self._url = ( 'http://restapi.amap.com/v3/direction/walking?key='
+                          + self._api_key
                           + '&origin=' + origin_longitude_latitude
                           + '&destination=' + destination_longitude_latitude
                           + '&output=JSON'
                           )
-        elif( travel_mode == "bicycling"):
-            self._url = ( '/v4/direction/bicycling?key='
-                          + api_key
+        elif( self._travel_mode == "bicycling"):
+            self._url = ( 'http://restapi.amap.com/v4/direction/bicycling?key='
+                          + self._api_key
                           + '&origin=' + origin_longitude_latitude
                           + '&destination=' + destination_longitude_latitude
                           )
         else:
-            self._url = ( '/v3/direction/driving?key='
-                          + api_key
+            self._url = ( 'http://restapi.amap.com/v3/direction/driving?key='
+                          + self._api_key
                           + '&origin=' + origin_longitude_latitude
                           + '&destination=' + destination_longitude_latitude
                           + '&extensions=base'
-                          + '&strategy=' + str(strategy)
+                          + '&strategy=' + str(self._strategy)
                           + '&output=JSON'
                           )
-            
-        self.update(dt_util.now())
-        track_time_interval( hass, self.update, TIME_BETWEEN_UPDATES )
+        return True
 
 
+    @asyncio.coroutine    
+    def async_update(self, now):
 
+        try:
+            session = async_get_clientsession(self._hass)
+            with async_timeout.timeout(15, loop=self._hass.loop):
+                response = yield from session.get(self._url)
+
+        except(asyncio.TimeoutError, aiohttp.ClientError):
+            _LOGGER.error("Error while accessing: %s", self._url)
+            return
+
+        if response.status != 200:
+            _LOGGER.error("Error while accessing: %s, status=%d", self._url, response.status)
+            return
+
+        data = yield from response.json()
+
+        if data is None:
+            _LOGGER.error("Request api Error: %s", self._url)
+            return
         
-    def update(self, now):
-        
-        conn = http.client.HTTPConnection(self._host)
-        conn.request("GET",self._url)
-        result = conn.getresponse()
-
-        if(result.status != 200):
-            _LOGGER.error("Error http reponse: %d", result.status)
-
-        data = json.loads( str(result.read(),encoding = 'utf-8') )
-
         if(self._travel_mode != "bicycling"):
             if(data['status'] != '1'):
                 _LOGGER.error("Error Api return, state=%s, errmsg=%s",
@@ -213,7 +237,6 @@ class GaodeTravelTimeData(Entity):
                               data['info']
                               )
                 return
-
             dataroute = data["route"]
 
             
@@ -241,7 +264,7 @@ class GaodeTravelTimeData(Entity):
             if ('road' in step.keys() and step["road"] != []):
                 if( step["assistant_action"] == "到达目的地" ):
                     if (step["road"] != roadbefore):
-                        bypasstext = bypasstext + roadbefore + step["road"] + "。"
+                        bypasstext = bypasstext + roadbefore + "、" +  step["road"] + "。"
                         roadbefore = step["road"]
                     else:
                         bypasstext = bypasstext + roadbefore + "。"
@@ -252,8 +275,12 @@ class GaodeTravelTimeData(Entity):
                     elif (step["road"] != roadbefore):
                         bypasstext = bypasstext + roadbefore + "、"
                         roadbefore = step["road"]
+            else:
+                if( step["assistant_action"] == "到达目的地" ):
+                        bypasstext = bypasstext + roadbefore + "。"
+                    
         
-        self._textguide = ("距离%.1f公里。需花时%d分钟。%s"
+        self._textguide = ("行程%.1f公里。需花时%d分钟。%s"
                            %(self._distance,
                              self._duration,
                              bypasstext
@@ -261,7 +288,9 @@ class GaodeTravelTimeData(Entity):
                           )
         self._update_time = dt_util.now()
 
-    def get_longitude_latitude(self, address_dict):
+
+    @asyncio.coroutine
+    def async_get_longitude_latitude(self, address_dict):
             
         if address_dict.get(CONF_LONGITUDE_LATITUDE) is not None:
             return address_dict.get(CONF_LONGITUDE_LATITUDE)
@@ -269,21 +298,31 @@ class GaodeTravelTimeData(Entity):
         if (address_dict.get(CONF_ADDRESS) is None) or (address_dict.get(CONF_CITY) is None):
             return
             
-        url = ("/v3/geocode/geo?key="
+        url = ("http://restapi.amap.com/v3/geocode/geo?key="
                + self._api_key
                + '&address=' + address_dict.get(CONF_ADDRESS)
                + '&city=' + address_dict.get(CONF_CITY)
                )
 
-        conn = http.client.HTTPConnection(self._host)
-        conn.request("GET",quote(url, safe='/:?=&'))
-        result = conn.getresponse()
+        try:
+            session = async_get_clientsession(self._hass)
+            with async_timeout.timeout(15, loop=self._hass.loop):
+                response = yield from session.get( url )
 
-        if(result.status != 200):
-            _LOGGER.error("Error http reponse: %d", result.status)
+        except(asyncio.TimeoutError, aiohttp.ClientError):
+            _LOGGER.error("Error while accessing: %s", url)
+            return
 
-        data = json.loads( str(result.read(),encoding = 'utf-8') )
-        if(data['status'] != '1'):
+        if response.status != 200:
+            _LOGGER.error("Error while accessing: %s, status=%d", url, response.status)
+            return
+
+        data = yield from response.json()
+
+        if data is None:
+            _LOGGER.error("Request api Error: %s", url)
+            return
+        elif (data['status'] != '1'):
             _LOGGER.error("Error Api return, state=%s, errmsg=%s",
                           data['status'],
                           data['info']
@@ -291,5 +330,3 @@ class GaodeTravelTimeData(Entity):
             return
 
         return data['geocodes'][0]['location']
-            
-
