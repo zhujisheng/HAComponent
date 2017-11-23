@@ -6,6 +6,7 @@ Support for the baidu speech service.
 import logging
 import voluptuous as vol
 
+from homeassistant.const import CONF_API_KEY
 from homeassistant.components.tts import Provider, PLATFORM_SCHEMA, CONF_LANG
 import homeassistant.helpers.config_validation as cv
 
@@ -21,9 +22,8 @@ SUPPORT_LANGUAGES = [
 DEFAULT_LANG = 'zh'
 
 
-CONF_APPID = 'appid'
-CONF_APIKEY = 'apikey'
-CONF_SECRETKEY = 'secretkey'
+CONF_APP_ID = 'app_id'
+CONF_SECRET_KEY = 'secret_key'
 CONF_SPEED = 'speed'
 CONF_PITCH = 'pitch'
 CONF_VOLUME = 'volume'
@@ -31,9 +31,9 @@ CONF_PERSON = 'person'
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_LANG, default=DEFAULT_LANG): vol.In(SUPPORT_LANGUAGES),
-    vol.Required(CONF_APPID): cv.string,
-    vol.Required(CONF_APIKEY): cv.string,
-    vol.Required(CONF_SECRETKEY): cv.string,
+    vol.Required(CONF_APP_ID): cv.string,
+    vol.Required(CONF_API_KEY): cv.string,
+    vol.Required(CONF_SECRET_KEY): cv.string,
     vol.Optional(CONF_SPEED, default=5): vol.All(
         vol.Coerce(int), vol.Range(min=0, max=9)),
     vol.Optional(CONF_PITCH, default=5): vol.All(
@@ -61,9 +61,9 @@ class BaiduTTSProvider(Provider):
         self.name = 'BaiduTTS'
 
         self._app_data = {
-            'appid': conf.get(CONF_APPID),
-            'apikey': conf.get(CONF_APIKEY),
-            'secretkey': conf.get(CONF_SECRETKEY),
+            'appid': conf.get(CONF_APP_ID),
+            'apikey': conf.get(CONF_API_KEY),
+            'secretkey': conf.get(CONF_SECRET_KEY),
             }
 
         self._speech_conf_data = {
@@ -104,3 +104,4 @@ class BaiduTTSProvider(Provider):
             return (None, None)
 
         return (self._codec, result)
+

@@ -1,25 +1,53 @@
-The Baidu text-to-speech platform uses <a href="https://cloud.baidu.com/product/speech/tts">Baidu TTS engine</a> to read a text with natural sounding voices.
+The `baidu` text-to-speech platform uses [Baidu TTS engine](https://cloud.baidu.com/product/speech/tts) to read a text with natural sounding voices.
 
-To enable text-to-speech with Baidu, add the following lines to your configuration.yaml:
+To get started, add the following lines to your `configuration.yaml`:
 
-<pre class="lang:yaml decode:true">
+```yaml
 #Example configuration.yaml entry
 tts:
   - platform: baidu
-    appid: YOUR_APPID 
-    apikey: YOUR_APIKEY
-    secretkey: YOUR_SECRETKEY
+    app_id: YOUR_APPID
+    api_key: YOUR_APIKEY
+    secret_key: YOUR_SECRETKEY
     person: 4
-</pre>
-    
-Configura</li>tion variables:
-<ul><li>appid(Required): AppID for use this service, registered on Baidu.</li>
-  <li>apikey(Required): Apikey from Baidu.</li>
-<li>secretkey(Required): Secretkey from Baidu.</li>
-<li>speed(Optional): Audio speed, from 0 to 9, default is 5.</li>
-<li>pitch(Optional): Audio pitch, from 0 to 9, default is 5.</li>
-<li>volume(Optional): Audio volume, from 0 to 15, default is 5.</li>
-<li>person(Optional): You can choose 0, 1, 3, 4, default is 0(a female voice)</li>
-</ul>
+```
 
-Put the file "baidu.py" in the dir: "~/.homeassistant/custom_components/tts/"
+Configuration variables:
+
+- **app_id** (*Required*): AppID for use this service, registered on Baidu.
+- **api_key** (*Required*): Apikey from Baidu.
+- **secret_key** (*Required*): Secretkey from Baidu.
+- **speed** (*Optional*): Audio speed, from 0 to 9, default is 5.
+- **pitch** (*Optional*): Audio pitch, from 0 to 9, default is 5.
+- **volume** (*Optional*): Audio volume, from 0 to 15, default is 5.
+- **person** (*Optional*): You can choose 0, 1, 3, 4, default is 0(a female voice).
+
+**Put the file "baidu.py" in the dir: "~/.homeassistant/custom_components/tts/"**
+
+
+【中文】
+
+`baidu` tts平台使用[百度tts云服务](https://cloud.baidu.com/product/speech/tts)将文字转换成语音。
+
+将以下内容放置在`configuration.yaml`文件中：
+```yaml
+# configuration.yaml样例
+tts:
+  - platform: baidu
+    app_id: YOUR_APPID
+    api_key: YOUR_APIKEY
+    secret_key: YOUR_SECRETKEY
+    person: 4
+```
+
+可配置项：
+
+- **app_id** (*必须项*): 在百度云平台上登记的AppID。
+- **api_key** (*必须项*): 百度云平台上的Apikey。
+- **secret_key** (*必须项*): 百度云平台上的Secretkey。
+- **speed** (*可选项*): 语音速度，从0到9，缺省值为5。
+- **pitch** (*可选项*): 语调，从0到9，缺省值为5。
+- **volume** (*可选项*): 音量，从0到15，缺省值为5。
+- **person** (*可选项*): 可选项：0, 1, 3, 4。缺省值为0（女声）。
+
+**将文件"baidu.py"放置在以下目录： "~/.homeassistant/custom_components/tts/"**
