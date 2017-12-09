@@ -1,3 +1,5 @@
+This component has been added to Home-Assistant since 0.59.
+
 The `baidu` text-to-speech platform uses [Baidu TTS engine](https://cloud.baidu.com/product/speech/tts) to read a text with natural sounding voices.
 
 To get started, add the following lines to your `configuration.yaml`:
@@ -22,10 +24,10 @@ Configuration variables:
 - **volume** (*Optional*): Audio volume, from 0 to 15, default is 5.
 - **person** (*Optional*): You can choose 0, 1, 3, 4, default is 0(a female voice).
 
-**Put the file "baidu.py" in the dir: "~/.homeassistant/custom_components/tts/"**
 
 
 【中文解释】
+此组件已经在HomeAssistant0.59版本中正式包含了。
 
 `baidu` tts平台使用[百度tts云服务](https://cloud.baidu.com/product/speech/tts)将文字转换成语音。
 
@@ -50,4 +52,3 @@ tts:
 - **volume** （*可选项*）: 音量，从0到15，缺省值为5。
 - **person** （*可选项*）: 可选项：0, 1, 3, 4。缺省值为0（女声）。
 
-**将文件"baidu.py"放置在以下目录： "~/.homeassistant/custom_components/tts/"**
