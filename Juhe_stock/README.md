@@ -16,7 +16,7 @@ sensor:
 - **symbols** (*列表 可选项*): 股票代码列表. 如果未配置, 缺省值是sz000002 (万科A)。
 
 
-###Description in English
+###Description in English###
 The Juhe stock platform uses <a href="https://www.juhe.cn/docs/api/id/21" rel="noopener" target="_blank">Juhe's stock cloud api</a>. It can get the price of stock on Shanghai and Shenzhen's security market.
 
 To enable a sensor with juhe_stock, add the following lines to your configuration.yaml:
