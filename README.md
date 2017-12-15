@@ -10,6 +10,7 @@
 - **gaode_travel_time**：实时交通信息（使用高德地图开放API）。
 - **juhe_joke**：笑话（使用聚合数据服务）。
 - **juhe_laohuangli**：老黄历（使用聚合数据服务）。
+- **program_train**：编写HomeAssistant组件与平台程序的学习样例
 
 
 
