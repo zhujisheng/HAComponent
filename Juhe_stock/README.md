@@ -2,7 +2,7 @@
 
 将以下内容放置在`configuration.yaml`文件中：
 ```yaml
-#Example configuration.yaml entry
+# configuration.yaml样例
 sensor:
   - platform: juhe_stock
     key: xxxxxxxxxxxxxxxxxxxx
@@ -13,7 +13,7 @@ sensor:
 ```
 可配置项：
 - **key** （*必选项*）: 聚合数据API的Key。
-- **symbols** array(**可选项**): 股票代码列表. 如果未配置, 缺省值是sz000002 (万科A)。
+- **symbols** (*列表 可选项*): 股票代码列表. 如果未配置, 缺省值是sz000002 (万科A)。
 
 
 ###Description in English
