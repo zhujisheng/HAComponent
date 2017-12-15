@@ -15,7 +15,7 @@ sensor:
 将文件"juhe_joke.py"放在以下目录: "<code>~/.homeassistant/custom_components/sensor/</code>"。
 每天会更新20条笑话信息。如果您想更换，调用服务“sensor.jokes_update”。
 
-
+<h3>description in English<h3>
 The Joke sensor uses Juhe's <a href="https://www.juhe.cn/docs/api/id/95/aid/281">open platform's joke api</a>.
 
 To enable a sensor with juhe_joke, add the following lines to your configuration.yaml:
