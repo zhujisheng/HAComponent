@@ -105,7 +105,7 @@ class JuheJokeData(object):
         self.story = {}
         self.hass = hass
 
-        self.url = "http://japi.juhe.cn/joke/content/text.from"
+        self.url = "http://v.juhe.cn/joke/content/text.php"
         self.key = key
 
         self.state = None
