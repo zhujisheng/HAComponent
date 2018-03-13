@@ -70,7 +70,9 @@ rpa = redpoint_agent()
 @asyncio.coroutine
 def setup(hass, config=None):
     """Set up the component."""
-    rpa.config['config_path'] = rpa.detectConfigPath()
+
+    rpa.config['config_path'] = hass.config.config_dir
+    #rpa.config['config_path'] = rpa.detectConfigPath()
     rpa.config["editing_config_path"] = rpa.editingConfigPath()
     rpa.copyConfig(rpa.config['config_path'])
     
@@ -79,7 +81,8 @@ def setup(hass, config=None):
     hass.http.register_view(RedpointInfoView)
     hass.http.register_view(RedpointView)
 
-    #setup_cors(hass.http.app, ["http://configurator.hachina.io"])
+    if not "cors_allowed_origins" in config["http"]:
+        setup_cors(hass.http.app, ["http://configurator.hachina.io"])
 
     yield from hass.components.frontend.async_register_built_in_panel(
         'iframe', "红点", "mdi:hand-pointing-right",
@@ -137,7 +140,8 @@ class RedpointConfigurationView(HomeAssistantView):
         """Return themes."""
         path = rpa.config['editing_config_path'] + '/configuration.yaml'
         with open(path, 'w', encoding='utf8') as configuration:
-            configuration.write(request.get_json()['data'])
+            content= yield from request.json()
+            configuration.write(content['data'])
 
         return web.Response(text='', content_type="text/html")
 
@@ -175,9 +179,3 @@ class RedpointView(HomeAssistantView):
         msg = "<script>window.location.assign(\"http://configurator.hachina.io/config?agent=" + str(request.url.origin()) + "\");</script>"
 
         return web.Response(text=msg, content_type="text/html")
-
-
-
-
-
-        
