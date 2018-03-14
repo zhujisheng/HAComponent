@@ -6,7 +6,5 @@
  
 ```yaml
 redpoint:
-http:
-  cors_allowed_origins:
-    - 'http://configurator.hachina.io'
+
 ```
