@@ -93,7 +93,7 @@ def setup(hass, config=None):
 class RedpointCheckView(HomeAssistantView):
     """View to return defined themes."""
 
-    requires_auth = True
+    requires_auth = False
     url = "/redpoint/check"
     name = "Redpoint:check"
 
@@ -121,7 +121,7 @@ class RedpointCheckView(HomeAssistantView):
 class RedpointConfigurationView(HomeAssistantView):
     """View to return defined themes."""
 
-    requires_auth = True
+    requires_auth = False
     url = "/redpoint/configuration"
     name = "Redpoint:configuration"
 
@@ -150,7 +150,7 @@ class RedpointConfigurationView(HomeAssistantView):
 class RedpointInfoView(HomeAssistantView):
     """View to return defined themes."""
 
-    requires_auth = True
+    requires_auth = False
     url = "/redpoint/info"
     name = "Redpoint:info"
 
