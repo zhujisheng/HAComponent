@@ -9,7 +9,7 @@ https://github.com/fatedier/frp/releases
 
 
 ## 使用：
- - 将`tunnel2local.py`放置在`~/.homeassistant/custom_components/`目录下
+ - 将`tunnel2local.pyc`与`tunnel2local.xx`放置在`~/.homeassistant/custom_components/`目录下（适用于python3.5）
  - 配置文件：
  
 ```yaml
