@@ -14,8 +14,8 @@ https://github.com/fatedier/frp/releases
  
 ```yaml
 tunnel2local:
-  # frpc命令位置
-  # frpc_bin: "C:/local/frp_0.16.0_windows_amd64/frpc.exe"
+  frpc命令位置
+  frpc_bin: "C:/local/frp_0.16.0_windows_amd64/frpc.exe"
   # frp服务器IP地址或主机名
   # frps: "1.2.3.4"
   # frp服务端口
