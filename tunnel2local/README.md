@@ -23,3 +23,5 @@ tunnel2local:
   frpc_bin: "C:/local/frp_0.16.0_windows_amd64/frpc.exe"
 
 ```
+## （可选）搭建自己的frp服务器
+如果您选择搭建自己的frp服务器，参见：https://github.com/zhujisheng/HAComponent/blob/master/tunnel2local/server_diy.md
