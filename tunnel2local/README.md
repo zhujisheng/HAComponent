@@ -24,4 +24,4 @@ tunnel2local:
 
 ```
 ## （可选）搭建自己的frp服务器
-如果您选择搭建自己的frp服务器，参见：https://github.com/zhujisheng/HAComponent/blob/master/tunnel2local/server_diy.md
+如果您选择搭建自己的frp服务器，参见：[server_diy.md](server_diy.md)
