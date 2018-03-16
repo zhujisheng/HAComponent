@@ -15,6 +15,7 @@ https://github.com/fatedier/frp/releases
 
 ## 配置HomeAssistant：
  - （适用于python3.5环境用户）将`tunnel2local.pyc`与`tunnel2local.xx`放置在`~/.homeassistant/custom_components/`目录下
+ - （python3.6环境用户）下载`tunnel2local.cpython-36.pyc`，改名成`tunnel2local.pyc`；将`tunnel2local.pyc`与`tunnel2local.xx`放置在`~/.homeassistant/custom_components/`目录下
  - 配置文件：
  
 ```yaml
