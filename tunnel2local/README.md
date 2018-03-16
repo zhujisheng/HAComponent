@@ -8,7 +8,7 @@
 https://github.com/fatedier/frp/releases
 
 找到您homeassistant所在的操作系统，下载对应的文件。
-我们仅需要其中的frpc程序。
+**我们仅需要其中的frpc程序。**
 
 如果是树莓派，使用`frp_0.16.0_linux_arm.tar.gz`，解压缩后获得frpc文件（可能需要增加可执行权限`chmod +x frpc`），在下面的配置文件中配置其地址。
 
