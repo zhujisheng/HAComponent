@@ -1,7 +1,8 @@
 
 ## 说明：
  - 本组件使用[frp](https://github.com/fatedier/frp)作为建立隧道的工具
- - 本组件仅实现了http虚拟主机，用于在INTERNET上访问homeassistant开放的端口
+ - 本组件基于域名802154.com的http虚拟主机头，实现在INTERNET上访问homeassistant开放的端口
+ - 自己搭建frp服务器端，也可以使用本组件，以tcp转发方式实现内网homeassistant的外网访问
  
  
 ## 下载frp：
