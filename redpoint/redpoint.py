@@ -3,110 +3,79 @@
 For more details about HAChina,
 https://www.hachina.io/
 """
-import asyncio
-import logging
-import json
+#import asyncio
 import subprocess
 import shutil
-import re
 import os
-
-from aiohttp import web
-
-import voluptuous as vol
-from homeassistant.components.http import HomeAssistantView
-from homeassistant.components.http import setup_cors
-
-#from . import redpoint_agent as rpa
-
-DOMAIN = 'redpoint'
-URL = '/' + DOMAIN
-
-
-_LOGGER = logging.getLogger(__name__)
-
-CONFIG_SCHEMA = vol.Schema({
-    DOMAIN: vol.Schema({}),
-}, extra=vol.ALLOW_EXTRA)
+import time
 
 class redpoint_agent(object):
 
+    def __init__(self, ConfigPath=None, EditPath=None, Cmd_hass='hass'):
+        self._version = '0.0.3'
 
-    def __init__(self):
-        self.VERSION = "0.0.2"
-        self.config = {}
-        self.startupinfo = None
         if os.name == 'nt':
-            self.startupinfo = subprocess.STARTUPINFO()
-            self.startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            self._startupinfo = subprocess.STARTUPINFO()
+            self._startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        else:
+            self._startupinfo = None
 
-    def detectConfigPath(self):
-        data_dir = os.getenv('APPDATA') if os.name == "nt" \
+        self._config = {}
+        if ConfigPath is None:
+            self._config['config_path']=self._detectConfigPath()
+        else:
+            self._config['config_path']=ConfigPath
+
+        if EditPath is None:
+            self._config['editing_config_path']=self._editingConfigPath()
+        else:
+            self._config['editing_config_path']=EditPath
+
+        self._Cmd_hass = Cmd_hass
+
+
+    def _detectConfigPath(self):
+        data_dir = os.getenv('APPDATA') if os.name == 'nt' \
             else os.path.expanduser('~')
         return os.path.join(data_dir, '.homeassistant')
 
 
-    def editingConfigPath(self):
-        data_dir = os.getenv('APPDATA') if os.name == "nt" \
+    def _editingConfigPath(self):
+        data_dir = os.getenv('APPDATA') if os.name == 'nt' \
             else os.path.expanduser('~')
         return os.path.join(data_dir, '.haconfig_tmp')
 
 
-    def ignored_files(self,adir, filenames):
+    def _ignored_files(self,adir, filenames):
         return [filename for filename in filenames if
-                filename == "deps"
+                (adir.endswith('deps') and filename=='man')
+                or (('deps' in adir) and ('Python' in adir) and filename=='Scripts')
+                or (adir.endswith('site-packages') and ('colorlog' not in filename))
+                or filename == 'tts'
                 or filename.endswith('.db')
+                #or filename == '__pycache__'
                 ]
 
-
-    def copyConfig(self, src):
-        to = self.config["editing_config_path"]
+    def copyConfig(self):
+        to = self._config['editing_config_path']
         if os.path.exists(to):
             shutil.rmtree(to)
-        shutil.copytree(src, to, ignore=self.ignored_files)
+        shutil.copytree(self._config['config_path'], to, ignore=self._ignored_files)
 
-rpa = redpoint_agent()
-
-@asyncio.coroutine
-def setup(hass, config=None):
-    """Set up the component."""
-
-    rpa.config['config_path'] = hass.config.config_dir
-    #rpa.config['config_path'] = rpa.detectConfigPath()
-    rpa.config["editing_config_path"] = rpa.editingConfigPath()
-    rpa.copyConfig(rpa.config['config_path'])
-    
-    hass.http.register_view(RedpointCheckView)
-    hass.http.register_view(RedpointConfigurationView)
-    hass.http.register_view(RedpointInfoView)
-    hass.http.register_view(RedpointView)
-
-    if not "cors_allowed_origins" in config["http"]:
-        setup_cors(hass.http.app, ["http://configurator.hachina.io"])
-
-    yield from hass.components.frontend.async_register_built_in_panel(
-        'iframe', "红点", "mdi:hand-pointing-right",
-            'redpoint_config', {'url': URL})
-    return True
-
-
-class RedpointCheckView(HomeAssistantView):
-    """View to return defined themes."""
-
-    requires_auth = False
-    url = "/redpoint/check"
-    name = "Redpoint:check"
-
-    @asyncio.coroutine
-    def get(self, request):
-        """Return themes."""
-        cmd = ["hass", "--script", "check_config",
-               "-c", rpa.config['editing_config_path']]
+    def Check(self):
+        cmd = [self._Cmd_hass, "--script", "check_config",
+               "-c", self._config['editing_config_path']]
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE,
                              stdin=subprocess.PIPE,
-                             startupinfo=rpa.startupinfo)
+                             startupinfo=self._startupinfo)
         out, err = p.communicate()
+        #p = yield from asyncio.create_subprocess_exec(*cmd,
+        #                                              stdout=asyncio.subprocess.PIPE,
+        #                                              stderr=asyncio.subprocess.PIPE,
+        #                                              stdin=asyncio.subprocess.PIPE,
+        #                                              )
+        #out, err = yield from p.communicate()
         if(err):
             raise Exception(err)
 
@@ -115,67 +84,177 @@ class RedpointCheckView(HomeAssistantView):
         else:
             out = out.decode()
 
+        return out
+
+    def ReadConfiguration(self):
+        path = os.path.join(self._config['editing_config_path'], 'configuration.yaml')
+        with open(path, 'r', encoding='utf8') as configuration:
+            content = configuration.read()
+
+        return content
+
+    def WriteConfiguration(self, content):
+        path = os.path.join(self._config['editing_config_path'], 'configuration.yaml')
+        with open(path, 'w', encoding='utf8') as configuration:
+            configuration.write(content)
+
+        return True
+
+    def Publish(self):
+        file_from = os.path.join(self._config['editing_config_path'] , 'configuration.yaml')
+        file_to = os.path.join(self._config['config_path'] , 'configuration.yaml')
+        file_backup = file_to + '.' + time.strftime('%Y%m%d%H%M%S',time.localtime(time.time()))
+        shutil.copyfile(file_to, file_backup)
+        shutil.copyfile(file_from, file_to)
+        return True
+
+
+    @property
+    def config(self):
+        return self._config
+
+    @property
+    def version(self):
+        return self._version
+
+
+import logging
+import asyncio
+from aiohttp import web
+import json
+import uuid
+
+import voluptuous as vol
+from homeassistant.util.async import run_coroutine_threadsafe
+from homeassistant.components.http import HomeAssistantView
+from homeassistant.components.http import setup_cors
+
+#from .redpoint_agent import redpoint_agent
+
+DOMAIN = 'redpoint'
+
+_LOGGER = logging.getLogger(__name__)
+
+CONFIG_SCHEMA = vol.Schema({
+    DOMAIN: vol.Schema({}),
+}, extra=vol.ALLOW_EXTRA)
+
+
+#@asyncio.coroutine
+def setup(hass, config=None):
+    """Set up the component."""
+
+    rpa = redpoint_agent(ConfigPath=hass.config.config_dir)
+    rpa.copyConfig()
+
+    token = '/%s'%(str(uuid.uuid4()))
+
+    views={
+        "Redpoint:root":["/redpoint", True, RedpointRootView],
+        "Redpoint:redirect":["%s/redpoint/redirect"%(token), False, RedpointRedirectView],
+        "Redpoint:check":["%s/redpoint/check"%(token), False, RedpointCheckView],
+        "Redpoint:configuration":["%s/redpoint/configuration"%(token), False, RedpointConfigurationView],
+        "Redpoint:info":["%s/redpoint/info"%(token), False, RedpointInfoView],
+        "Redpoint:version":["%s/redpoint/version"%(token), False, RedpointVersionView],
+        "Redpoint:publish":["%s/redpoint/publish"%(token), False, RedpointPublishView],
+        }
+    for name, t in views.items():
+        view = t[2]()
+        setattr( view, 'name', name )
+        setattr( view, 'url', t[0] )
+        setattr( view, 'requires_auth', t[1] )
+        setattr( view, 'rpa', rpa )
+        setattr( view, 'token', token )
+        setattr( view, 'hass', hass )
+
+        hass.http.register_view(view)
+
+    if not "cors_allowed_origins" in config["http"]:
+        setup_cors(hass.http.app, ["http://configurator.hachina.io"])
+
+    #yield from hass.components.frontend.async_register_built_in_panel(
+    #    'iframe', "红点", "mdi:hand-pointing-right",
+    #    'redpoint_config', {'url': views["Redpoint:redirect"][0]})
+    run_coroutine_threadsafe(hass.components.frontend.async_register_built_in_panel(
+                           'iframe', "红点", "mdi:hand-pointing-right",
+                           'redpoint_config', {'url': views["Redpoint:redirect"][0]}),
+                             hass.loop
+                       )
+    return True
+
+class RedpointRootView(HomeAssistantView):
+    """View to return defined themes."""
+    @asyncio.coroutine
+    def get(self, request):
+        """Return themes."""
+        msg = "<script>window.location.assign(\"http://configurator.hachina.io/config?agent=%s%s\");</script>"%(str(request.url.origin()), self.token)
+        return web.Response(text=msg, content_type="text/html")
+
+class RedpointRedirectView(HomeAssistantView):
+    """View to return defined themes."""
+    @asyncio.coroutine
+    def get(self, request):
+        """Return themes."""
+        msg = "<script>window.location.assign(\"http://configurator.hachina.io/config?agent=%s%s\");</script>"%(str(request.url.origin()), self.token)
+        return web.Response(text=msg, content_type="text/html")
+
+
+class RedpointCheckView(HomeAssistantView):
+    """View to return defined themes."""
+    @asyncio.coroutine
+    def get(self, request):
+        """Return themes."""
+        #out = self.rpa.Check()
+        out = yield from self.hass.async_add_job(self.rpa.Check)
         return web.Response(text=out, content_type="text/html")
 
 
 class RedpointConfigurationView(HomeAssistantView):
     """View to return defined themes."""
-
-    requires_auth = False
-    url = "/redpoint/configuration"
-    name = "Redpoint:configuration"
-
-
     @asyncio.coroutine
     def get(self, request):
         """Return themes."""
-        path = rpa.config['editing_config_path'] + '/configuration.yaml'
-        with open(path, 'r', encoding='utf8') as configuration:
-            content = configuration.read()
-
-        return web.Response(text=content, content_type="text/html")
+        out = yield from self.hass.async_add_job(self.rpa.ReadConfiguration)
+        return web.Response(text=out, content_type="text/html")
 
     @asyncio.coroutine
     def post(self, request):
         """Return themes."""
-        path = rpa.config['editing_config_path'] + '/configuration.yaml'
-        with open(path, 'w', encoding='utf8') as configuration:
-            content= yield from request.json()
-            configuration.write(content['data'])
+        content= yield from request.json()
 
-        return web.Response(text='', content_type="text/html")
-
+        result = yield from self.hass.async_add_job(self.rpa.WriteConfiguration, content['data'])
+        if result:
+            out = 'OK'
+        else:
+            out = 'KO'
+        return web.Response(text=out, content_type="text/html")
 
 
 class RedpointInfoView(HomeAssistantView):
     """View to return defined themes."""
-
-    requires_auth = False
-    url = "/redpoint/info"
-    name = "Redpoint:info"
-
     @asyncio.coroutine
     def get(self, request):
         """Return themes."""
+        out = json.dumps(self.rpa.config)
+        return web.Response(text=out, content_type="text/html")
 
-        msg = json.dumps(rpa.config)
-
-        return web.Response(text=msg, content_type="text/html")
-
-
-
-class RedpointView(HomeAssistantView):
+class RedpointVersionView(HomeAssistantView):
     """View to return defined themes."""
-
-    requires_auth = True
-    url = URL
-    name = DOMAIN
-
     @asyncio.coroutine
     def get(self, request):
         """Return themes."""
+        out = self.rpa.version
+        return web.Response(text=out, content_type="text/html")
 
-        #msg = "<script>window.location.assign(\"http://\"+location.hostname+\":5000\");</script>"
-        msg = "<script>window.location.assign(\"http://configurator.hachina.io/config?agent=" + str(request.url.origin()) + "\");</script>"
 
-        return web.Response(text=msg, content_type="text/html")
+class RedpointPublishView(HomeAssistantView):
+    """View to return defined themes."""
+    @asyncio.coroutine
+    def get(self, request):
+        """Return themes."""
+        result = yield from self.hass.async_add_job(self.rpa.Publish)
+        if result:
+            out = 'OK'
+        else:
+            out = 'KO'
+        return web.Response(text=out, content_type="text/html")
