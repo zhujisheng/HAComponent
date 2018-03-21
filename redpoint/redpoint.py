@@ -8,6 +8,7 @@ import subprocess
 import shutil
 import os
 import time
+import json
 
 class redpoint_agent(object):
 
@@ -84,7 +85,10 @@ class redpoint_agent(object):
         else:
             out = out.decode()
 
-        return out
+        return json.dumps({
+            'isOK': p.returncode == 0,
+            'msg': out
+            })
 
     def ReadConfiguration(self):
         path = os.path.join(self._config['editing_config_path'], 'configuration.yaml')
@@ -250,7 +254,7 @@ class RedpointVersionView(HomeAssistantView):
 class RedpointPublishView(HomeAssistantView):
     """View to return defined themes."""
     @asyncio.coroutine
-    def get(self, request):
+    def post(self, request):
         """Return themes."""
         result = yield from self.hass.async_add_job(self.rpa.Publish)
         if result:
