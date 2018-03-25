@@ -174,7 +174,7 @@ def setup(hass, config=None):
         hass.http.register_view(view)
 
     if not "cors_allowed_origins" in config["http"]:
-        setup_cors(hass.http.app, ["http://configurator.hachina.io"])
+        setup_cors(hass.http.app, ["http://redpoint.hachina.io"])
 
     #yield from hass.components.frontend.async_register_built_in_panel(
     #    'iframe', "红点", "mdi:hand-pointing-right",
@@ -191,7 +191,7 @@ class RedpointRootView(HomeAssistantView):
     @asyncio.coroutine
     def get(self, request):
         """Return themes."""
-        msg = "<script>window.location.assign(\"http://configurator.hachina.io/config?agent=%s%s\");</script>"%(str(request.url.origin()), self.token)
+        msg = "<script>window.location.assign(\"http://redpoint.hachina.io/haconfig?agent=%s%s\");</script>"%(str(request.url.origin()), self.token)
         return web.Response(text=msg, content_type="text/html")
 
 class RedpointRedirectView(HomeAssistantView):
@@ -199,7 +199,7 @@ class RedpointRedirectView(HomeAssistantView):
     @asyncio.coroutine
     def get(self, request):
         """Return themes."""
-        msg = "<script>window.location.assign(\"http://configurator.hachina.io/config?agent=%s%s\");</script>"%(str(request.url.origin()), self.token)
+        msg = "<script>window.location.assign(\"http://redpoint.hachina.io/haconfig?agent=%s%s\");</script>"%(str(request.url.origin()), self.token)
         return web.Response(text=msg, content_type="text/html")
 
 
