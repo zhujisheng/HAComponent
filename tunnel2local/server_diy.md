@@ -16,10 +16,10 @@ privilege_token = 12345678
  ```yaml
 tunnel2local:
   # frpc命令位置
-  frpc_bin: "C:/local/frp_0.16.0_windows_amd64/frpc.exe"
-  frps: 1.2.3.4
+  frpc_bin: "C:/local/frp_0.18.0_windows_amd64/frpc.exe"
+  frps: 1.2.3.4   #服务器地址
   frps_port: 7000  #缺省值为7000
-  frp_privilege_token: "12345678"  #缺省值为空
+  frp_token: "12345678"  #缺省值为空
   remote_port: 8123  #缺省值为8123
 
 ```
