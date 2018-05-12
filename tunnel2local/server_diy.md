@@ -6,7 +6,7 @@
 ```ini
 [common]
 bind_port = 7000
-privilege_token = 12345678
+token = 12345678
 ```
 其余的配置项可以参见frps项目的配置说明
 
