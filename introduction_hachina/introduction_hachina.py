@@ -45,6 +45,8 @@ def async_setup(hass, config=None):
  - [Samba](https://www.samba.org/)
  - [SshD](https://www.openssh.com/)
  - [AppDaemon&DashBoard](https://appdaemon.readthedocs.io/)
+注：[AppDaemon&DashBoard]服务已安装，但没有初始化启动。请在`/home/pi/appdaemon/appdaemon.yaml`中配置token后使用。设置自启动服务命令`sudo systemctl enable appdaemon@pi`。
+
  
 密码与修改:
 
@@ -57,7 +59,6 @@ def async_setup(hass, config=None):
 第一次启动，HomeAssistant会自动生成配置文件，与标准的HomeAssistant缺省配置比较，有以下不同：
 
  - 配置目录下空白的`known_devices.yaml`文件
- - 配置来自自身（127.0.0.1）的访问不需要认证trusted_networks
  - 配置在sensor组件下的bitcoin平台
  - 将tts组件中google平台设置为中文
  - 媒体播放器（media_player）组件中配置vlc平台
