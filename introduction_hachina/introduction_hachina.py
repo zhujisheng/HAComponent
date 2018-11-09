@@ -45,13 +45,12 @@ def async_setup(hass, config=None):
  - [Samba](https://www.samba.org/)
  - [SshD](https://www.openssh.com/)
  - [AppDaemon&DashBoard](https://appdaemon.readthedocs.io/)
-注：[AppDaemon&DashBoard]服务已安装，但没有初始化启动。请在`/home/pi/appdaemon/appdaemon.yaml`中配置token后使用。设置自启动服务命令`sudo systemctl enable appdaemon@pi`。
+注：AppDaemon&DashBoard服务已安装，但没有初始化启动。请在`/home/pi/appdaemon/appdaemon.yaml`中配置token后使用。设置自启动服务命令`sudo systemctl enable appdaemon@pi`。
 
  
 密码与修改:
 
  - 操作系统的`pi`账号，初始密码为`hachina`。以`pi`账号登录后，使用`passwd`命令修改
- - HomeAssistant的未设置API密码（Legacy API Password）
  - Jupyter Notebook的初始访问密码为`hachina`。以`pi`账号登录后，使用`jupyter notebook password`命令修改
  - Mosquitto的用户名为`pi`，初始密码为`hachina`。以`pi`账号登录后，使用`sudo mosquitto_passwd /etc/mosquitto/passwd pi`命令修改
  - DashBoard的初始访问密码为`hachina`（访问端口为5050）。以`pi`账号登录后，在文件`/home/pi/appdaemon/appdaemon.yaml`中修改。
