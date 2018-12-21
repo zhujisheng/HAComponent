@@ -44,6 +44,8 @@ def async_setup(hass, config=None):
  - [Mosquitto](http://www.mosquitto.org/)
  - [Samba](https://www.samba.org/)
  - [SshD](https://www.openssh.com/)
+ - [Node-RED](https://nodered.org/)
+注：Node-RED服务已安装，但没有初始化启动。设置自启动服务命令`sudo systemctl enable nodered.service`。
  - [AppDaemon&DashBoard](https://appdaemon.readthedocs.io/)
 注：AppDaemon&DashBoard服务已安装，但没有初始化启动。请在`/home/pi/appdaemon/appdaemon.yaml`中配置token后使用。设置自启动服务命令`sudo systemctl enable appdaemon@pi`。
 
@@ -54,6 +56,7 @@ def async_setup(hass, config=None):
  - Jupyter Notebook的初始访问密码为`hachina`。以`pi`账号登录后，使用`jupyter notebook password`命令修改
  - Mosquitto的用户名为`pi`，初始密码为`hachina`。以`pi`账号登录后，使用`sudo mosquitto_passwd /etc/mosquitto/passwd pi`命令修改
  - DashBoard的初始访问密码为`hachina`（访问端口为5050）。以`pi`账号登录后，在文件`/home/pi/appdaemon/appdaemon.yaml`中修改。
+ - Node-RED初始用户与密码未设置。在文件`/home/pi/.node-red/settings.js`中修改（使用命令`node-red-admin hash-pw`生成密码的hash值）。
 
 第一次启动，HomeAssistant会自动生成配置文件，与标准的HomeAssistant缺省配置比较，有以下不同：
 
