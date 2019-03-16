@@ -11,6 +11,8 @@
 
 `sudo dpkg -i chromium-chromedriver_65.0.3325.181-0ubuntu0.14.04.1_armhf.deb`
 <br>
+<br>
+
 **`sensor.py`文件放置在`.homeassistant/custom_components/scrape2/`目录中。
 **
 <br>
