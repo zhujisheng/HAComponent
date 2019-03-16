@@ -12,7 +12,7 @@ sensor:
 <ul>
 	<li>key(Required): 从聚合数据api申请获得的key.</li>
 </ul>
-将文件"juhe_laohuangli.py"放在以下目录: "<code>~/.homeassistant/custom_components/sensor/</code>"
+将文件"sensor.py"放在以下目录: "<code>~/.homeassistant/custom_components/juhe_laohuangli/</code>"
 
 <h3>Description in English</h3>
 The Juhe Laohuangli uses Juhe's <a href="https://www.juhe.cn/docs/api/id/65" rel="noopener" target="_blank">Loahuangli api</a>.
@@ -29,7 +29,7 @@ variables:
 <ul>
 	<li>key(Required): Key from Juhe.</li>
 </ul>
-Put the file "juhe_laohuangli.py" in the dir: "<code>~/.homeassistant/custom_components/sensor/</code>"
+Put the file "sensor.py" in the dir: "<code>~/.homeassistant/custom_components/juhe_laohuangli/</code>"
 
 
 

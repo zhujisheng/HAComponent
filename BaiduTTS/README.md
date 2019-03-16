@@ -1,4 +1,4 @@
-此组件已经在HomeAssistant0.59版本中正式包含了。
+***此组件已经在HomeAssistant0.59之后的版本中正式包含了。***
 
 `baidu` tts平台使用[百度tts云服务](https://cloud.baidu.com/product/speech/tts)将文字转换成语音。
 

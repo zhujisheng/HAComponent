@@ -12,7 +12,7 @@ sensor:
 <ul>
 	<li>key(Required): 从聚合数据api申请获得的key.</li>
 </ul>
-将文件"juhe_joke.py"放在以下目录: "<code>~/.homeassistant/custom_components/sensor/</code>"。
+将文件"sensor.py"放在以下目录: "<code>~/.homeassistant/custom_components/juhe_joke/</code>"。
 每天会更新20条笑话信息。如果您想更换，调用服务“sensor.jokes_update”。
 
 <h3>description in English</h3>
@@ -29,5 +29,5 @@ variables:
 <ul>
 	<li>key(Required): Key from Juhe.</li>
 </ul>
-Put the file "juhe_joke.py" in the dir: "<code>~/.homeassistant/custom_components/sensor/</code>"
+Put the file "sensor.py" in the dir: "<code>~/.homeassistant/custom_components/juhe_joke/</code>"
 The sensor update imformation every day(get 20 jokes from Juhe), if you want to change some jokes, call service "sensor.jokes_update".
