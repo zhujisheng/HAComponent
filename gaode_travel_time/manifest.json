@@ -1,0 +1,8 @@
+{
+  "domain": "gaode_travel_time",
+  "name": "gaode_travel_time",
+  "documentation": "https://github.com/zhujisheng/HAComponent/tree/master/gaode_travel_time",
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": []
+}

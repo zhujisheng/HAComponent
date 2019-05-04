@@ -72,6 +72,7 @@ variables:
   <li>city(Optional): The Chinese city name</li>
   <li>address(Optional): The address in Chinese</li>
 </ul>
-Put the file "gaode_travel_time.py" in the dir: "~/.homeassistant/custom_components/sensor/"
 
-The sensor update imformation every half hour, if you want the current imformation, can call service "sensor.gaode_travel_time_update".
+Put the file `sensor.py` `__init__.py` `manifest.json` in the dir: `~/.homeassistant/custom_components/gaode_travel_time/`
+
+The sensor update imformation every half hour, if you want the current imformation, can call service `sensor.gaode_travel_time_update`.

@@ -38,4 +38,4 @@ variables:
 	<li><strong>symbols</strong> array(<em>Optional</em>): List of stock market symbols for given companies. If not specified, it defaults to sz000002 (万科A).</li>
 </ul>
 
-Put the file "sensor.py" in the dir: "<code>~/.homeassistant/custom_components/juhe_stock/</code>"
+Put the file `sensor.py` `__init__.py` `manifest.json` in the dir: `~/.homeassistant/custom_components/juhe_stock/`

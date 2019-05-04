@@ -1,0 +1,8 @@
+{
+  "domain": "aliyun_stock",
+  "name": "aliyun_stock",
+  "documentation": "https://github.com/zhujisheng/HAComponent/tree/master/aliyun_stock",
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": []
+}

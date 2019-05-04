@@ -1,4 +1,5 @@
 <h3>中文说明</h3>
+
 聚合数据老黄历信息(juhe_laohuangli)从<a href="https://www.juhe.cn/docs/api/id/65" rel="noopener" target="_blank">聚合数据API</a>获得数据。
 在HA的configuration.yaml中的配置：
 <pre class="lang:yaml decode:true " >
@@ -12,7 +13,8 @@ sensor:
 <ul>
 	<li>key(Required): 从聚合数据api申请获得的key.</li>
 </ul>
-将文件"sensor.py"放在以下目录: "<code>~/.homeassistant/custom_components/juhe_laohuangli/</code>"
+
+将文件`sensor.py` `__init__.py` `manifest.json`放在以下目录: `~/.homeassistant/custom_components/juhe_laohuangli/`
 
 <h3>Description in English</h3>
 The Juhe Laohuangli uses Juhe's <a href="https://www.juhe.cn/docs/api/id/65" rel="noopener" target="_blank">Loahuangli api</a>.
@@ -29,7 +31,8 @@ variables:
 <ul>
 	<li>key(Required): Key from Juhe.</li>
 </ul>
-Put the file "sensor.py" in the dir: "<code>~/.homeassistant/custom_components/juhe_laohuangli/</code>"
+
+Put the file `sensor.py` `__init__.py` `manifest.json` in the dir: `~/.homeassistant/custom_components/juhe_laohuangli/`
 
 
 
