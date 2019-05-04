@@ -13,7 +13,7 @@
 <br>
 <br>
 
-`sensor.py`文件放置在`.homeassistant/custom_components/scrape2/`目录中。
+`sensor.py` `__init__.py` `manifest.json`文件放置在`.homeassistant/custom_components/scrape2/`目录中。
 
 <br>
 <br>

@@ -9,8 +9,6 @@ from homeassistant.const import (
 from homeassistant.helpers.entity import Entity
 import homeassistant.helpers.config_validation as cv
 
-REQUIREMENTS = ['beautifulsoup4==4.7.1', 'selenium==3.141.0']
-
 _LOGGER = logging.getLogger(__name__)
 
 CONF_ATTR = 'attribute'
