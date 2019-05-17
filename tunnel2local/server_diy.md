@@ -11,7 +11,7 @@ token = 12345678
 其余的配置项可以参见frps项目的配置说明
 
 ## HomeAssistant配置
- - 如[readme](https://github.com/zhujisheng/HAComponent/tree/master/tunnel2local)中所述，安放`tunnel2local.pyc`和`tunnel2local.xx`文件
+ - 如[readme](https://github.com/zhujisheng/HAComponent/tree/master/tunnel2local)中所述，安放`__init__.py`和`manifest`文件
  - 配置文件：
  ```yaml
 tunnel2local:
