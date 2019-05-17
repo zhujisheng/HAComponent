@@ -1,0 +1,8 @@
+{
+  "domain": "introduction_hachina",
+  "name": "introduction_hachina",
+  "documentation": "https://github.com/zhujisheng/HAComponent/blob/master/introduction_hachina/introduction_hachina.py",
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": []
+}

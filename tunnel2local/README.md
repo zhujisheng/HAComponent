@@ -10,16 +10,18 @@ https://github.com/fatedier/frp/releases
 
 找到您homeassistant所在的操作系统，下载对应的文件。
 **我们仅需要其中的frpc程序。**
-**目前服务器端为0.18.0版，因此请下载对应客户端版本**
+**缺省的服务器端为0.18.0版。如果你使用缺省服务器，请下载对应客户端版本；如果你自己搭建服务器端，服务器端与客户端版本一致即可**
+**缺省服务器端仅供测试使用，流量较大，网络质量不好；建议自己搭建服务器端**
 
-如果是树莓派，使用`frp_0.18.0_linux_arm.tar.gz`，解压缩后获得frpc文件（可能需要增加可执行权限`chmod +x frpc`），在下面的配置文件中配置其地址。
+例如：如果是树莓派，如果要使用0.18版本，对应文件为`frp_0.18.0_linux_arm.tar.gz`，解压缩后获得frpc文件（可能需要增加可执行权限`chmod +x frpc`），在下面的配置文件中配置其地址。
 
 
 ## 配置HomeAssistant：
- - （适用于python3.5环境用户）将`tunnel2local.pyc`与`tunnel2local.xx`放置在`~/.homeassistant/custom_components/`目录下
- - （python3.6环境用户）下载`tunnel2local.cpython-36.pyc`，改名成`tunnel2local.pyc`；改名后的文件与`tunnel2local.xx`放置在`~/.homeassistant/custom_components/`目录下
+ - 在`~/.homeassistant/custom_components/`目录下构建子目录`tunnel2local`
+ - 下载文件`__init__.py`与`manifest.json`，放置在目录`tunnel2local`中
  - 配置文件：
- ```yaml
+
+```yaml
 tunnel2local:
   # frpc命令位置
   frpc_bin: "C:/local/frp_0.18.0_windows_amd64/frpc.exe"

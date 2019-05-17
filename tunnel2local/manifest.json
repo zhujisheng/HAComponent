@@ -1,0 +1,8 @@
+{
+  "domain": "tunnel2local",
+  "name": "tunnel2local",
+  "documentation": "https://github.com/zhujisheng/HAComponent/tree/master/tunnel2local",
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": []
+}
