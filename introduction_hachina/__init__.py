@@ -71,7 +71,7 @@ def async_setup(hass, config=None):
  
 我们的网站：[https://www.hachina.io](https://www.hachina.io)
 
-欲去除本卡信息，请编辑`configuration.yaml`文件，删除或注释调`introduction_hachina`组件
+欲去除本卡信息，请编辑`configuration.yaml`文件，删除或注释`introduction_hachina`组件配置
 """, '欢迎使用HACHINA.IO创建的镜像文件！')  # noqa
 
     return True
