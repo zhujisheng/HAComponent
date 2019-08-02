@@ -33,7 +33,8 @@ sensor:
   <li>city(Optional): 城市名</li>
   <li>address(Optional): 具体的地址描述</li>
 </ul>
-将文件"gaode_travel_time.py"放置在以下目录: "~/.homeassistant/custom_components/sensor/"。
+
+将文件`sensor.py`、`__init__.py`、`manifest.json`放置在目录`~/.homeassistant/custom_components/gaode_travel_time/`中。
 
 组件每半小时更新一次信息，如果想获得当前的信息，调用服务："sensor.gaode_travel_time_update"。
 
