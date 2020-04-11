@@ -16,7 +16,7 @@ token = 12345678
  ```yaml
 tunnel2local:
   # frpc命令位置
-  frpc_bin: "C:/local/frp_0.18.0_windows_amd64/frpc.exe"
+  frpc_bin: "C:/local/frp_0.32.1_windows_amd64/frpc.exe"
   frps: 1.2.3.4   #服务器地址
   frps_port: 7000  #缺省值为7000
   frp_token: "12345678"  #缺省值为空

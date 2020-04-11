@@ -12,7 +12,7 @@ https://github.com/fatedier/frp/releases
 
 **我们仅需要其中的frpc程序。**
 
-**缺省的服务器端为0.18.0版。如果你使用缺省服务器，请下载对应客户端版本；如果你自己搭建服务器端，服务器端与客户端版本一致即可**
+**缺省的服务器端为0.32.1版。如果你使用缺省服务器，请下载对应客户端版本；如果你自己搭建服务器端，服务器端与客户端版本一致即可**
 
 **缺省服务器端仅供测试使用，流量较大，网络质量不好；建议自己搭建服务器端**
 
@@ -27,7 +27,7 @@ https://github.com/fatedier/frp/releases
 ```yaml
 tunnel2local:
   # frpc命令位置
-  frpc_bin: "C:/local/frp_0.18.0_windows_amd64/frpc.exe"
+  frpc_bin: "C:/local/frp_0.32.1_windows_amd64/frpc.exe"
 
 ```
 ## （可选）搭建自己的frp服务器

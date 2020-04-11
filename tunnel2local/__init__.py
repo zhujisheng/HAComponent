@@ -13,7 +13,6 @@ import hashlib
 import voluptuous as vol
 from homeassistant.core import Event
 from homeassistant.helpers import config_validation as cv
-from homeassistant.components.weblink import Link
 from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.helpers.event import async_call_later
 
@@ -121,7 +120,11 @@ def async_setup(hass, config):
 
     _LOGGER.info("tunnel2local started, hass can be visited from internet - %s", url)
 
-    Link(hass, "Internet Address", url, "mdi:router-wireless")
+    hass.states.async_set("sensor.tunnel2local",
+                          url,
+                          attributes={"icon": "mdi:router-wireless",
+                                      "friendly_name": "外网访问地址"}
+                          )
 
     def probe_frpc(now):
         if(process.returncode):
@@ -167,4 +170,3 @@ def run2(frpc_command):
                          stderr=asyncio.subprocess.PIPE,
                          stdin=asyncio.subprocess.PIPE)
     return p
-
