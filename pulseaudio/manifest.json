@@ -1,0 +1,17 @@
+{
+  "domain": "pulseaudio",
+  "name": "Pulse Audio",
+  "config_flow": true,
+  "documentation": "https://www.home-assistant.io/integrations/pulseaudio",
+  "requirements": [
+    "SoundCard==0.4.0",
+    "numpy==1.19.0"
+  ],
+  "ssdp": [],
+  "zeroconf": [],
+  "homekit": {},
+  "dependencies": ["ffmpeg"],
+  "codeowners": [
+    "@zhujisheng"
+  ]
+}

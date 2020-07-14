@@ -1,0 +1,21 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Pulse Audio MediaPlayer",
+        "description": "Set up A MediaPlayer based on the local Pulse Audio service. If you have problems with configuration go to: https://www.home-assistant.io/integrations/pulseaudio\n",
+        "data": {
+          "name": "The name to use in the frontend.",
+          "sink": "The output device id in PulseAudio."
+        }
+      }
+    },
+    "error": {
+      "invalid_sink_id": "Invalid Sink ID",
+      "unknown": "[%key:common::config_flow::error::unknown%]"
+    },
+    "abort": {
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+    }
+  }
+}
