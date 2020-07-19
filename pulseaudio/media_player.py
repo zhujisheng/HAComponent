@@ -64,11 +64,7 @@ class PulseAudioSpeaker(MediaPlayerEntity):
         self._name = name
         self._state = STATE_IDLE
         self._manager = hass.data[DATA_FFMPEG]
-
-        if(sink == DEFAULT_SINK):
-            self._speaker = sc.default_speaker()
-        else:
-            self._speaker = sc.get_speaker(sink)
+        self.sink = sink
 
     @property
     def name(self):
@@ -95,6 +91,11 @@ class PulseAudioSpeaker(MediaPlayerEntity):
             )
             return
 
+        if(sink == DEFAULT_SINK):
+            speaker = sc.default_speaker()
+        else:
+            speaker = sc.get_speaker(sink)
+
         _LOGGER.info('play_media: %s', media_id)
         self._state = STATE_PLAYING
         self.schedule_update_ha_state()
@@ -114,7 +115,7 @@ class PulseAudioSpeaker(MediaPlayerEntity):
                         stream_reader.read(-1), self._hass.loop).result()
         data = np.frombuffer(data, dtype=np.int16)/pow(2,15)
 
-        self._speaker.play(data, samplerate=16000, channels=1)
+        speaker.play(data, samplerate=16000, channels=1)
 
         urllib.request.urlcleanup()
         self._state = STATE_IDLE
