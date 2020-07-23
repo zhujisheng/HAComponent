@@ -35,3 +35,10 @@ media_player:
   ```
 
 4. 在前端集成中配置，或者在`configuration.yaml`中配置。如果在`configuration.yaml`中配置，sink的名称可以通过命令`docker exec hassio_audio pactl list sinks`查看
+
+注：如果你不是在HASSOS上运行hassio-supervisor，你可能需要运行以下命令，去除Host操作系统上的`pulseaudio`和`bluealsa`，因为它们会首先截获蓝牙设备链接信息。
+```
+sudo apt-get remove pulseaudio
+sudo apt-get remove bluealsa
+sudo reboot
+```
