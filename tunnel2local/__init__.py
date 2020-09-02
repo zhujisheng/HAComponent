@@ -66,7 +66,7 @@ def async_setup(hass, config):
         subdomain = mid3.decode().rstrip('=').lower()
 
     if conf.get(CONF_FRPS) is None:
-        host = "ec2-18-221-17-124.us-east-2.compute.amazonaws.com"
+        host = "hachinafrps.duckdns.org"
         port = 7000
         token = "welcome2ha"
         subdomain_host = "hachina.802154.com"
