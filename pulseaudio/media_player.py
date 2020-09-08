@@ -3,15 +3,12 @@ Support for PulseAudio speakers(sinks)
 
 """
 import voluptuous as vol
-import asyncio
 import logging
-import urllib.request
-import numpy as np
-
-import soundcard as sc
 
 from homeassistant.components.media_player.const import (
-    SUPPORT_PLAY_MEDIA, MEDIA_TYPE_MUSIC)
+    SUPPORT_PLAY_MEDIA, 
+    SUPPORT_STOP,
+    MEDIA_TYPE_MUSIC)
 from homeassistant.components.media_player import (
     MediaPlayerEntity, PLATFORM_SCHEMA)
 from homeassistant.const import (
@@ -19,7 +16,7 @@ from homeassistant.const import (
 import homeassistant.helpers.config_validation as cv
 from homeassistant.components.ffmpeg import DATA_FFMPEG
 
-from .mm2pcm import PCMStream
+from .ffmpeg2pa import AudioPlay
 
 from .const import (
     DOMAIN,
@@ -28,7 +25,10 @@ from .const import (
     DEFAULT_SINK,
 )
 
-SUPPORT_PULSEAUDIO = SUPPORT_PLAY_MEDIA
+SUPPORT_PULSEAUDIO = (
+    SUPPORT_PLAY_MEDIA
+    | SUPPORT_STOP
+    )
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
@@ -63,8 +63,11 @@ class PulseAudioSpeaker(MediaPlayerEntity):
         self._hass = hass
         self._name = name
         self._state = STATE_IDLE
-        self._manager = hass.data[DATA_FFMPEG]
-        self._sink = sink
+        if(sink == DEFAULT_SINK):
+            device_option = ""
+        else:
+            device_option = "--device=%s"%(sink)
+        self._AudioPlayer = AudioPlay(hass.data[DATA_FFMPEG].binary, device_option)
 
     @property
     def name(self):
@@ -91,32 +94,21 @@ class PulseAudioSpeaker(MediaPlayerEntity):
             )
             return
 
-        if(self._sink == DEFAULT_SINK):
-            speaker = sc.default_speaker()
-        else:
-            speaker = sc.get_speaker(self._sink)
-
         _LOGGER.info('play_media: %s', media_id)
+        self._AudioPlayer.play(media_id)
         self._state = STATE_PLAYING
         self.schedule_update_ha_state()
 
-        try:
-            local_path, _ = urllib.request.urlretrieve(media_id)
-        # urllib.error.HTTPError
-        except Exception:  # pylint: disable=broad-except
-            local_path = media_id
-
-        stream = PCMStream(self._manager.binary, loop=self._hass.loop)
-        stream_reader = asyncio.run_coroutine_threadsafe(
-            stream.PCMStreamReader(input_source=local_path),
-            self._hass.loop).result()
-
-        data = asyncio.run_coroutine_threadsafe(
-                        stream_reader.read(-1), self._hass.loop).result()
-        data = np.frombuffer(data, dtype=np.int16)/pow(2,15)
-
-        speaker.play(data, samplerate=16000, channels=1)
-
-        urllib.request.urlcleanup()
+    def media_stop(self):
+        """Send stop command."""
+        self._AudioPlayer.stop()
         self._state = STATE_IDLE
         self.schedule_update_ha_state()
+
+    def update(self):
+        """Get the latest details from the device."""
+        if self._AudioPlayer.is_running:
+            self._state = STATE_PLAYING
+        else:
+            self._state = STATE_IDLE
+        return True

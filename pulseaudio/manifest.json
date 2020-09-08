@@ -3,9 +3,7 @@
   "name": "Pulse Audio",
   "config_flow": true,
   "documentation": "https://www.home-assistant.io/integrations/pulseaudio",
-  "requirements": [
-    "SoundCard==0.4.0"
-  ],
+  "requirements": [],
   "ssdp": [],
   "zeroconf": [],
   "homekit": {},
