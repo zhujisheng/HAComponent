@@ -12,8 +12,6 @@ media_player:
 - **name** （*可选项*）: media_player的实体名，缺省值为`Pulse Audio Speaker`
 - **sink** (*可选项*): PulseAudio服务中音频输出设备，可以通过命令`pactl list sinks`查看系统中所有的sink。sink缺省为`default`，表示使用系统的缺省音频输出设备。
 
-你也可以在前端`集成`中进行配置，但首先需要修改HomeAssistant源代码`homeassistant/generated/config_flows.py`，在其中添加`"pulseaudio",`
-
 ## 在hassio中配置蓝牙音箱
 
 1. [进入主操作系统](https://developers.home-assistant.io/docs/operating-system/debugging)
