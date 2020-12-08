@@ -8,6 +8,7 @@ import logging
 from homeassistant.components.media_player.const import (
     SUPPORT_PLAY_MEDIA, 
     SUPPORT_STOP,
+    SUPPORT_VOLUME_SET,
     MEDIA_TYPE_MUSIC)
 from homeassistant.components.media_player import (
     MediaPlayerEntity, PLATFORM_SCHEMA)
@@ -28,6 +29,7 @@ from .const import (
 SUPPORT_PULSEAUDIO = (
     SUPPORT_PLAY_MEDIA
     | SUPPORT_STOP
+    | SUPPORT_VOLUME_SET
     )
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
@@ -63,6 +65,7 @@ class PulseAudioSpeaker(MediaPlayerEntity):
         self._hass = hass
         self._name = name
         self._state = STATE_IDLE
+        self._volume = 1.0
         if(sink == DEFAULT_SINK):
             device_option = ""
         else:
@@ -78,6 +81,11 @@ class PulseAudioSpeaker(MediaPlayerEntity):
     def state(self):
         """Return the state of the device."""
         return self._state
+
+    @property
+    def volume_level(self):
+        """Volume level of the media player (0..1)."""
+        return self._volume
 
     @property
     def supported_features(self):
@@ -99,6 +107,12 @@ class PulseAudioSpeaker(MediaPlayerEntity):
         self._state = STATE_PLAYING
         self.schedule_update_ha_state()
 
+    def set_volume_level(self, volume):
+        """Set volume level, range 0..1."""
+        self._AudioPlayer.set_volume(int(volume * 65536))
+        self._volume = volume
+        self.schedule_update_ha_state()
+
     def media_stop(self):
         """Send stop command."""
         self._AudioPlayer.stop()
@@ -111,4 +125,5 @@ class PulseAudioSpeaker(MediaPlayerEntity):
             self._state = STATE_PLAYING
         else:
             self._state = STATE_IDLE
+        self._volume = self._AudioPlayer.volume/65536.0
         return True
