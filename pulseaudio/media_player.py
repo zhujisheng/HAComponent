@@ -64,6 +64,7 @@ class PulseAudioSpeaker(MediaPlayerEntity):
 
         self._hass = hass
         self._name = name
+        self._sink = sink
         self._state = STATE_IDLE
         self._volume = 1.0
         if(sink == DEFAULT_SINK):
@@ -76,6 +77,11 @@ class PulseAudioSpeaker(MediaPlayerEntity):
     def name(self):
         """Return the name of the device."""
         return self._name
+
+    @property
+    def unique_id(self):
+        """Return the unique ID of the device."""
+        return self._sink
 
     @property
     def state(self):
