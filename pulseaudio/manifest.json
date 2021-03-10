@@ -1,6 +1,7 @@
 {
   "domain": "pulseaudio",
   "name": "Pulse Audio",
+  "version": "1.0.5",
   "config_flow": true,
   "documentation": "https://www.home-assistant.io/integrations/pulseaudio",
   "requirements": [],
