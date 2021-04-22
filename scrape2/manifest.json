@@ -2,7 +2,8 @@
   "domain": "scrape2",
   "name": "scrape2",
   "documentation": "https://github.com/zhujisheng/HAComponent/tree/master/scrape2",
-  "requirements": ["beautifulsoup4==4.7.1", "selenium==3.141.0"],
+  "requirements": ["beautifulsoup4==4.9.3", "selenium==3.141.0"],
   "dependencies": [],
-  "codeowners": []
+  "codeowners": [],
+  "version": "1.0.0"
 }

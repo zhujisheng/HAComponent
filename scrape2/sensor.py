@@ -1,6 +1,11 @@
 import logging
+import os
 
 import voluptuous as vol
+
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from bs4 import BeautifulSoup
 
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.const import (
@@ -37,14 +42,22 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     if value_template is not None:
         value_template.hass = hass
 
+    if os.path.exists("/usr/lib/chromium/chromedriver"):
+        driver = "/usr/lib/chromium/chromedriver"
+    elif os.path.exists("/usr/lib/chromium-browser/chromedriver"):
+        driver = "/usr/lib/chromium-browser/chromedriver"
+    else:
+        _LOGGER.error("chromedriver hasn't been installed")
+        return False
+
     add_entities([
-        Scrape2Sensor(resource, name, select, attr, value_template, unit)], True)
+        Scrape2Sensor(resource, name, select, attr, value_template, unit, driver)], True)
 
 
 class Scrape2Sensor(Entity):
     """Representation of a web scrape sensor."""
 
-    def __init__(self, resource, name, select, attr, value_template, unit):
+    def __init__(self, resource, name, select, attr, value_template, unit, driver):
         """Initialize a web scrape sensor."""
         self._resource = resource
         self._name = name
@@ -53,6 +66,7 @@ class Scrape2Sensor(Entity):
         self._attr = attr
         self._value_template = value_template
         self._unit_of_measurement = unit
+        self._driver = driver
 
     @property
     def name(self):
@@ -71,19 +85,15 @@ class Scrape2Sensor(Entity):
 
     def update(self):
         """Get the latest data from the source and updates the state."""
-        from selenium import webdriver
-        from selenium.webdriver.chrome.options import Options
 
         chrome_options = Options()
         chrome_options.add_argument('--headless')
-        # chrome_options.add_argument("--user-data-dir=/home/pi/.selenium")
-        driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver',
-                                  chrome_options=chrome_options)
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-using")
+        driver = webdriver.Chrome(self._driver, options=chrome_options)
         driver.get( self._resource)
         innerHTML = driver.execute_script("return document.body.innerHTML")
         driver.quit()
-
-        from bs4 import BeautifulSoup
 
         raw_data = BeautifulSoup(innerHTML, 'html.parser')
         _LOGGER.debug(raw_data)
