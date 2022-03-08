@@ -2,20 +2,29 @@
 Support for PulseAudio speakers(sinks)
 
 """
+from __future__ import annotations
 import voluptuous as vol
 import logging
+import asyncio
 
 from homeassistant.components.media_player.const import (
-    SUPPORT_PLAY_MEDIA, 
-    SUPPORT_STOP,
+    MEDIA_TYPE_MUSIC,
+    SUPPORT_BROWSE_MEDIA,
+    SUPPORT_PLAY,
+    SUPPORT_PLAY_MEDIA,
     SUPPORT_VOLUME_SET,
-    MEDIA_TYPE_MUSIC)
+)
+
 from homeassistant.components.media_player import (
-    MediaPlayerEntity, PLATFORM_SCHEMA)
+    BrowseMedia,
+    async_process_play_media_url,
+    MediaPlayerEntity,
+    PLATFORM_SCHEMA)
 from homeassistant.const import (
     CONF_NAME, STATE_IDLE, STATE_PLAYING)
 import homeassistant.helpers.config_validation as cv
 from homeassistant.components.ffmpeg import DATA_FFMPEG
+from homeassistant.components import media_source
 
 from .ffmpeg2pa import AudioPlay
 
@@ -27,10 +36,11 @@ from .const import (
 )
 
 SUPPORT_PULSEAUDIO = (
-    SUPPORT_PLAY_MEDIA
-    | SUPPORT_STOP
+    SUPPORT_PLAY
+    | SUPPORT_PLAY_MEDIA
     | SUPPORT_VOLUME_SET
-    )
+    | SUPPORT_BROWSE_MEDIA
+)
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
@@ -100,13 +110,24 @@ class PulseAudioSpeaker(MediaPlayerEntity):
 
     def play_media(self, media_type, media_id, **kwargs):
         """Send play commmand."""
-        if not media_type == MEDIA_TYPE_MUSIC:
-            _LOGGER.error(
-                "Invalid media type %s. Only %s is supported",
-                media_type,
-                MEDIA_TYPE_MUSIC,
+
+        if media_source.is_media_source_id(media_id):
+            sourced_media = asyncio.run_coroutine_threadsafe(
+                                media_source.async_resolve_media(self._hass, media_id),
+                                self._hass.loop
+                                ).result()
+            media_type = sourced_media.mime_type
+            media_id = sourced_media.url
+
+        if media_type != MEDIA_TYPE_MUSIC and not media_type.startswith("audio/"):
+            raise HomeAssistantError(
+                f"Invalid media type {media_type}. Only {MEDIA_TYPE_MUSIC} is supported"
             )
-            return
+
+        # If media ID is a relative URL, we serve it from HA.
+        media_id = async_process_play_media_url(
+            self._hass, media_id
+        )
 
         _LOGGER.info('play_media: %s', media_id)
         self._AudioPlayer.play(media_id)
@@ -133,3 +154,13 @@ class PulseAudioSpeaker(MediaPlayerEntity):
             self._state = STATE_IDLE
         self._volume = self._AudioPlayer.volume/65536.0
         return True
+
+    async def async_browse_media(
+        self, media_content_type: str | None = None, media_content_id: str | None = None
+    ) -> BrowseMedia:
+        """Implement the websocket media browsing helper."""
+        return await media_source.async_browse_media(
+            self.hass,
+            media_content_id,
+            content_filter=lambda item: item.media_content_type.startswith("audio/"),
+        )
