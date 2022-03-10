@@ -3,7 +3,7 @@
   "name": "Pulse Audio",
   "version": "1.1.0",
   "config_flow": true,
-  "documentation": "https://www.home-assistant.io/integrations/pulseaudio",
+  "documentation": "https://github.com/zhujisheng/HAComponent/tree/master/pulseaudio",
   "requirements": [],
   "ssdp": [],
   "zeroconf": [],
