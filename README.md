@@ -4,13 +4,14 @@
 
 部分组件程序已经融入HomeAssistant的官方正式版本中，还有部分没有提交。
 
-- **pulseaudio**：媒体播放器，支持本地耳机插口，也支持蓝牙音箱。
-- **BaiduTTS**: 文字转语音服务（使用百度云）。
-- **Juhe_stock**：股票行情信息（使用聚合数据服务）。
-- **aliyun_stock**：股票行情信息（使用阿里云服务）。
-- **gaode_travel_time**：实时交通信息（使用高德地图开放API）。
-- **juhe_joke**：笑话（使用聚合数据服务）。
-- **juhe_laohuangli**：老黄历（使用聚合数据服务）。
+- **environment_variables**：设置homeassistant运行中的环境变量
+- **pulseaudio**：媒体播放器，支持本地耳机插口，也支持蓝牙音箱（已过期）
+- **BaiduTTS**: 文字转语音服务（使用百度云）
+- **Juhe_stock**：股票行情信息（使用聚合数据服务）
+- **aliyun_stock**：股票行情信息（使用阿里云服务）
+- **gaode_travel_time**：实时交通信息（使用高德地图开放API）
+- **juhe_joke**：笑话（使用聚合数据服务）
+- **juhe_laohuangli**：老黄历（使用聚合数据服务）
 - **program_train**：编写HomeAssistant组件与平台程序的学习样例
 
 

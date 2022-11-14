@@ -1,3 +1,5 @@
+**最新的HomeAssitant core已经不支持本组件**
+
 本组件连接PulseAudio服务，进行声音播放
 
 本组件可以在前端`集成`菜单中配置（推荐），也可以在`configuration.yaml`文件中配置：

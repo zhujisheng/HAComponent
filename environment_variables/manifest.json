@@ -1,0 +1,8 @@
+{
+  "version": "1.0.0",
+  "domain": "environment_variables",
+  "name": "Set Environment Variables",
+  "documentation": "https://www.home-assistant.io/integrations/environment_variables",
+  "codeowners": ["@zhujisheng"],
+  "iot_class": "local_push"
+}
